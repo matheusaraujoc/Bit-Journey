@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playPromise.then(_ => {
                 playPauseBtn.textContent = '⏸️'; playPauseBtn.title = 'Pausar';
             }).catch(error => {
-                console.log("Autoplay bloqueado...");
+                console.log("Autoplay bloqueado. Clique em 'Iniciar Jogo' ou Play.");
                 playPauseBtn.textContent = '▶️'; playPauseBtn.title = 'Tocar';
             });
         }
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             check: (output, helpers) => {
                 if (output.trim() === "Bit, acorde!") {
                     helpers.robotSpeak("Sistema... online!");
-                    helpers.robotWakeUp();
+                    helpers.robotWakeUp(); // <-- Chama a função que adiciona .awake
                     setTimeout(() => { helpers.showSuccess("Bit ativado!"); helpers.loadNextLevel(); }, 2000);
                     return true;
                 }
@@ -350,22 +350,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const victoryScreen = document.getElementById('victory-screen');
     const restartBtn = document.getElementById('restart-btn');
     const appHeader = document.querySelector('header');
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const appContainer = document.getElementById('app-container');
 
     // --- 4. FUNÇÕES AUXILIARES DE ANIMAÇÃO (Helpers) ---
-    // (Única mudança na função resetScene)
+    // (Única mudança na função robotWakeUp e resetScene)
 
     function robotSpeak(text) {
+        if (robotContainer.classList.contains('embarking') || robotContainer.classList.contains('hidden')) return;
         speechBubble.innerText = text;
-        speechBubble.className = robotContainer.className; // Pega a classe de posição atual (at-cave, etc)
-        speechBubble.classList.remove('hidden'); // Remove hidden para mostrar
-        // Esconde após um tempo
+        speechBubble.className = robotContainer.className;
+        speechBubble.classList.remove('hidden');
         setTimeout(() => { speechBubble.classList.add('hidden'); }, 2800);
     }
     function setRobotState(state) { if (state === 'thinking') robot.classList.add('thinking'); else robot.classList.remove('thinking'); }
     function updateEnergyBar(value) { energyBar.style.width = `${value}%`; }
     function showSuccess(message) { outputPre.innerText = `STATUS: ${message}`; outputPre.className = "output-success"; }
     function showError(message) { outputPre.innerText = `ERRO: ${message}`; outputPre.className = "output-error"; }
-    function robotWakeUp() { robot.classList.add('waking-up'); setTimeout(() => { robot.classList.remove('sleeping'); robot.classList.remove('waking-up'); }, 1000); }
+
+    // CORREÇÃO: Adiciona a classe .awake após a animação
+    function robotWakeUp() {
+        robot.classList.add('waking-up');
+        setTimeout(() => {
+            robot.classList.remove('sleeping');
+            robot.classList.remove('waking-up');
+            robot.classList.add('awake'); // Liga o propulsor via CSS
+        }, 1000);
+    }
+
     function robotMoveTo(target) { robotContainer.className = `at-${target}`; }
     function robotJump() { robot.classList.add('jumping'); setTimeout(() => { robot.classList.remove('jumping'); }, 1000); }
     function showInventory() { rocketInventory.classList.remove('hidden'); }
@@ -395,20 +408,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
 
+    // CORREÇÃO: resetScene ajustado
     function resetScene() {
         robot.classList.add('sleeping');
+        robot.classList.remove('awake'); // Garante que propulsor apague
         robotContainer.classList.remove('embarking');
         robotContainer.classList.remove('hidden');
         robotMoveTo('start');
-        speechBubble.classList.add('hidden'); // CORREÇÃO: Garante que a bolha suma ao reiniciar
+        speechBubble.classList.add('hidden'); // Garante que bolha suma
         updateEnergyBar(10);
         hideInventory();
         document.querySelectorAll('.part-icon').forEach(icon => icon.classList.remove('collected'));
         document.querySelectorAll('.piece-marker').forEach(marker => marker.classList.remove('collected'));
         rocket.className = '';
         fuelRocket(false);
-        // launchFlame.style.opacity = '0'; // Não é mais necessário, CSS cuida
-        idePanel.style.display = 'flex';
+        // launchFlame.style.opacity = '0'; // Não precisa, CSS cuida
+        idePanel.style.display = 'flex'; // Garante que IDE apareça
         gameWorld.classList.remove('decolando');
         victoryScreen.classList.add('hidden');
         victoryScreen.classList.remove('visible');
@@ -432,18 +447,15 @@ document.addEventListener('DOMContentLoaded', () => {
         robotJump, fuelRocket, robotEmbark, launchRocket, loadNextLevel, showVictoryScreen
     };
 
-    // --- 5. FUNÇÕES PRINCIPAIS DO JOGO (Idênticas) ---
-    // (Nenhuma mudança necessária aqui)
+    // --- 5. FUNÇÕES PRINCIPAIS DO JOGO ---
     function loadLevel(levelIndex) {
-        if (levelIndex === 0) {
-            resetScene();
-            appHeader.style.display = 'flex';
-            gameWorld.style.display = 'block';
-        }
+        // Reset da cena movido para startGame e restartBtn
+
         if (levelIndex >= levels.length) {
             console.log("Jogo concluído.");
             return;
         }
+
         const level = levels[levelIndex];
         levelTitle.innerText = level.title;
         levelDescription.innerText = level.description;
@@ -451,11 +463,14 @@ document.addEventListener('DOMContentLoaded', () => {
         levelHint.classList.add('hidden');
         codeEditor.value = level.starterCode;
         outputPre.innerText = "";
+
         runBtn.disabled = false;
         devNextLevelBtn.disabled = !isDevMode;
     }
+
     function showHint() { levelHint.classList.remove('hidden'); }
     function builtinRead(x) { if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'"; return Sk.builtinFiles["files"][x]; }
+
     function runCode() {
         runBtn.disabled = true;
         devNextLevelBtn.disabled = true;
@@ -488,6 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             );
     }
+
     function checkSolution(output, level) {
         try {
             const success = level.check(output, visualHelpers);
@@ -508,13 +524,42 @@ document.addEventListener('DOMContentLoaded', () => {
     runBtn.addEventListener('click', runCode);
     hintBtn.addEventListener('click', showHint);
     devNextLevelBtn.addEventListener('click', devSkipLevel);
-    restartBtn.addEventListener('click', () => {
+
+    // Listener do Botão Iniciar
+    startBtn.addEventListener('click', () => {
+        startScreen.classList.add('hidden');
+        appContainer.classList.remove('hidden'); // Mostra o jogo
+
         currentLevel = 0;
+        resetScene(); // Garante que a cena esteja no estado inicial
+        loadLevel(currentLevel); // Carrega a primeira missão
+
+        playMusic(); // Tenta iniciar a música
+    });
+
+    // CORREÇÃO: Listener do Botão Reiniciar
+    restartBtn.addEventListener('click', () => {
+        // 1. Esconde a tela de vitória
+        victoryScreen.classList.add('hidden');
+        victoryScreen.classList.remove('visible');
+
+        // 2. Garante que os containers principais estejam visíveis
+        appContainer.classList.remove('hidden');
         appHeader.style.display = 'flex';
         gameWorld.style.display = 'block';
-        loadLevel(currentLevel);
+        idePanel.style.display = 'flex'; // Garante que o IDE apareça
+
+        // 3. Reseta o estado do jogo e da música
         pauseMusic();
         loadTrack(0);
+        currentLevel = 0;
+
+        // 4. Reseta a cena visual e carrega o nível 0
+        resetScene();
+        loadLevel(currentLevel);
+
+        // 5. Tenta tocar a música novamente
+        playMusic();
     });
 
     // Listeners da Música
@@ -523,10 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
     prevBtn.addEventListener('click', playPrev);
     audioPlayer.addEventListener('ended', playNext); // Loop da playlist
 
-    // Inicialização
+    // Inicialização - Carrega a música mas NÃO inicia o jogo ainda
     checkDevMode();
     loadTrack(currentTrackIndex);
-    loadLevel(currentLevel);
-    // Tenta tocar a música (pode ser bloqueado)
-    playMusic();
+    // loadLevel e playMusic agora são chamados pelo startBtn
 });

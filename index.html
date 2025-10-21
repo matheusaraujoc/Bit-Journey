@@ -15,19 +15,26 @@
 
 <body>
 
-    <div id="app-container">
+    <div id="start-screen">
+        <div class="start-content">
+            <h1>Bit: A Jornada para Casa 🚀</h1>
+            <p>Ajude o robô Bit a encontrar as peças do seu foguete e voltar para casa usando comandos Python!</p>
+            <button id="start-btn">Iniciar Jogo</button>
+        </div>
+        <div class="start-stars-bg"></div>
+    </div>
+
+    <div id="app-container" class="hidden">
 
         <header>
             <div class="header-left">
                 <h1>Bit: A Jornada para Casa 🚀</h1>
-
                 <div id="music-controls">
                     <button id="prev-btn" class="music-btn" title="Voltar">⏮️</button>
                     <button id="play-pause-btn" class="music-btn" title="Tocar/Pausar">▶️</button>
                     <button id="next-btn" class="music-btn" title="Avançar">⏭️</button>
                 </div>
             </div>
-
             <div id="game-ui">
                 <div id="energy-bay" class="ui-panel">
                     <p>Energia:</p>

@@ -13,7 +13,6 @@
     --error-red: #e74c3c;
     --console-bg: #2b2b2b;
     --sky-color: #1a1f2b;
-    /* Azul/Preto um pouco mais profundo */
     --ground-color: #6c757d;
     --ground-dark: #495057;
     --robot-blue: #54a0ff;
@@ -24,6 +23,10 @@
     --robot-visor-on: #00e0ff;
     --thruster-fire: #ffc400;
     --thruster-fire-light: #ffe082;
+    --rock-color: #8d6e63;
+    /* Cor base da rocha */
+    --rock-shadow: #5d4037;
+    /* Cor da borda/sombra */
     --pos-start: 5%;
     --pos-power: 20%;
     --pos-cave: 35%;
@@ -42,6 +45,87 @@ body {
     background-color: var(--bg-darker);
     color: var(--dark-text);
 }
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Tela Inicial --- */
+#start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--sky-color);
+    color: white;
+    text-align: center;
+    z-index: 300;
+}
+
+.start-stars-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image:
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(1px 1px at 50px 160px, #ddd, rgba(255, 255, 255, 0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(2.5px 2.5px at 160px 120px, #ddd, rgba(255, 255, 255, 0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0.8;
+    animation: move-stars-initial 150s linear infinite;
+}
+
+.start-content {
+    position: relative;
+    z-index: 301;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 500px;
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+}
+
+#start-screen h1 {
+    font-size: 2.5em;
+    color: var(--primary-blue);
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px var(--primary-blue);
+}
+
+#start-screen p {
+    font-size: 1.1em;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+#start-btn {
+    padding: 15px 40px;
+    font-size: 1.4em;
+    font-weight: bold;
+    background: linear-gradient(45deg, var(--success-green), #238b3a);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+#start-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.6);
+}
+
 
 #app-container {
     display: flex;
@@ -179,7 +263,6 @@ header h1 {
     transition: background-color 2s ease-in;
 }
 
-/* Fundo de Estrelas Aleatório */
 @keyframes move-stars-initial {
     from {
         background-position: 0 0;
@@ -206,7 +289,6 @@ header h1 {
     position: absolute;
     top: 0;
     left: 0;
-    /* CORREÇÃO: Múltiplas camadas de radial-gradient para aleatoriedade */
     background-image:
         radial-gradient(1px 1px at 20px 30px, #fff, rgba(255, 255, 255, 0)),
         radial-gradient(1px 1px at 40px 70px, #fff, rgba(255, 255, 255, 0)),
@@ -216,9 +298,7 @@ header h1 {
         radial-gradient(2.5px 2.5px at 160px 120px, #ddd, rgba(255, 255, 255, 0));
     background-repeat: repeat;
     background-size: 200px 200px;
-    /* Tamanho do padrão que se repete */
     opacity: 0.8;
-    /* Um pouco mais visível */
     animation: move-stars-initial 150s linear infinite;
 }
 
@@ -226,7 +306,6 @@ header h1 {
     animation: move-stars-decolagem 8s linear infinite;
     opacity: 1;
     background-size: 100px 100px;
-    /* Estrelas parecem mais próximas e rápidas */
 }
 
 #game-scene {
@@ -236,7 +315,7 @@ header h1 {
 }
 
 #game-scene::after {
-    /* Chão com textura de crateras */
+    /* Chão */
     content: '';
     position: absolute;
     bottom: 0;
@@ -258,7 +337,6 @@ header h1 {
     opacity: 0;
 }
 
-/* Regra para esconder objetos da cena */
 #game-world.decolando #power-station,
 #game-world.decolando #cliff,
 #game-world.decolando #cave,
@@ -566,26 +644,21 @@ header h1 {
 .robot-thruster::after {
     content: '';
     width: 15px;
-    /* Mais largo que o propulsor */
     height: 25px;
-    /* Mais alto */
     background: linear-gradient(180deg, var(--thruster-fire-light), var(--thruster-fire), transparent);
-    /* Gradiente */
     position: absolute;
     bottom: -25px;
-    /* Abaixo do propulsor */
     left: 50%;
     transform: translateX(-50%);
-    /* Centraliza */
     border-radius: 0 0 50% 50%;
-    animation: robot-flicker 0.15s infinite alternate;
-    /* Animação flicker */
-    opacity: 0.9;
+    opacity: 0;
+    /* Começa invisível */
+    animation: none;
+    /* Começa sem animação */
+    transition: opacity 0.3s ease-in-out;
 }
 
 @keyframes robot-flicker {
-
-    /* Animação mais sutil que a do foguete */
     0% {
         opacity: 0.8;
         transform: translateX(-50%) scale(0.9, 1);
@@ -595,6 +668,12 @@ header h1 {
         opacity: 1;
         transform: translateX(-50%) scale(1, 1.1);
     }
+}
+
+/* CORREÇÃO: Liga o propulsor SÓ quando o robô está acordado (.awake) */
+#bit-robot.awake .robot-thruster::after {
+    opacity: 0.9;
+    animation: robot-flicker 0.15s infinite alternate;
 }
 
 #bit-robot.sleeping {
@@ -746,27 +825,36 @@ header h1 {
     bottom: 0;
 }
 
+/* CORREÇÃO: Rochas do Pântano */
 .swamp-platform {
-    width: 30px;
-    height: 30px;
-    background: #795548;
-    border: 3px solid #4e342e;
-    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    /* Tamanho ligeiramente variado */
+    background: var(--rock-color);
+    border: 3px solid var(--rock-shadow);
+    /* Borda irregular */
+    border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
     position: absolute;
     bottom: 10px;
     left: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Sombra interna */
 }
 
 .swamp-platform::after {
     content: '';
     width: 30px;
     height: 30px;
-    background: #795548;
-    border: 3px solid #4e342e;
-    border-radius: 50%;
+    /* Segunda rocha menor */
+    background: var(--rock-color);
+    border: 3px solid var(--rock-shadow);
+    /* Borda irregular diferente */
+    border-radius: 65% 35% 40% 60% / 55% 60% 40% 45%;
     position: absolute;
-    bottom: 0px;
-    left: 40px;
+    bottom: 5px;
+    left: 45px;
+    /* Posição ajustada */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Marcador de Peça */
@@ -785,7 +873,6 @@ header h1 {
 #marker-bico {
     /* CORREÇÃO: Sobe o marcador do bico */
     top: -25px;
-    /* Ajuste para ficar em cima da parte verde */
 }
 
 @keyframes glow {
@@ -916,16 +1003,13 @@ header h1 {
 /* Chama (CORRIGIDA) */
 #launch-flame {
     width: 40px;
-    /* Mais estreito que o motor */
     height: 80px;
     background: linear-gradient(180deg, var(--thruster-fire), transparent);
     bottom: -80px;
-    /* Posicionado abaixo do motor */
     border-radius: 0 0 50% 50%;
     left: 50%;
-    /* Centraliza */
     transform: translateX(-50%);
-    /* Centraliza */
+    /* Garante centralização */
     opacity: 0;
     /* CORREÇÃO: Começa invisível */
     animation: none;
@@ -933,8 +1017,6 @@ header h1 {
 }
 
 @keyframes flicker {
-
-    /* CORREÇÃO: Incluir translateX na animação para manter centralizado */
     0% {
         opacity: 1;
         transform: translateX(-50%) scale(1, 1);
@@ -952,7 +1034,6 @@ header h1 {
 }
 
 #rocket.launched {
-    /* CORREÇÃO: Combina as transformações para manter centralizado */
     transform: translateX(-50%) translateY(-450px);
 }
 
@@ -1002,6 +1083,7 @@ header h1 {
 }
 
 /* --- Tela de Vitória --- */
+/* (Idêntica) */
 #victory-screen {
     position: fixed;
     top: 0;
@@ -1029,7 +1111,6 @@ header h1 {
     position: absolute;
     width: 100%;
     height: 100%;
-    /* CORREÇÃO: Estrelas aleatórias também na tela de vitória */
     background-image:
         radial-gradient(1px 1px at 20px 30px, #fff, rgba(255, 255, 255, 0)),
         radial-gradient(1px 1px at 40px 70px, #fff, rgba(255, 255, 255, 0)),
@@ -1118,9 +1199,3 @@ header h1 {
 #bg-music {
     display: none;
 }
-
-.hidden {
-    display: none !important;
-}
-
-/* Garante que .hidden sempre funcione */
