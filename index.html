@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bit: A Jornada para Casa 🚀</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="app-container">
+
+        <header>
+            <div class="header-left">
+                <h1>Bit: A Jornada para Casa 🚀</h1>
+
+                <div id="music-controls">
+                    <button id="prev-btn" class="music-btn" title="Voltar">⏮️</button>
+                    <button id="play-pause-btn" class="music-btn" title="Tocar/Pausar">▶️</button>
+                    <button id="next-btn" class="music-btn" title="Avançar">⏭️</button>
+                </div>
+            </div>
+
+            <div id="game-ui">
+                <div id="energy-bay" class="ui-panel">
+                    <p>Energia:</p>
+                    <div id="energy-bar-container">
+                        <div id="energy-bar"></div>
+                    </div>
+                </div>
+                <div id="rocket-inventory" class="ui-panel hidden">
+                    <p>Peças Coletadas:</p>
+                    <div class="rocket-parts">
+                        <div id="part-motor" class="part-icon" title="Motor">⚙️</div>
+                        <div id="part-tanque" class="part-icon" title="Tanque">⛽</div>
+                        <div id="part-bico" class="part-icon" title="Bico">🔺</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div id="game-world">
+            <div id="stars-bg"></div>
+            <div id="game-scene">
+                <div id="bit-robot-container">
+                    <div id="bit-robot" class="sleeping">
+                        <div class="robot-antenna"></div>
+                        <div class="robot-head">
+                            <div class="robot-visor"></div>
+                        </div>
+                        <div class="robot-body">
+                            <div class="robot-arm left"></div>
+                            <div class="robot-arm right"></div>
+                        </div>
+                        <div class="robot-thruster"></div>
+                    </div>
+                </div>
+                <div id="speech-bubble" class="hidden">...</div>
+                <div id="power-station" class="scene-object"></div>
+                <div id="cliff" class="scene-object">
+                    <div class="cliff-top"></div>
+                    <div class="cliff-face"></div>
+                    <div class="piece-marker" id="marker-bico">🔺</div>
+                </div>
+                <div id="cave" class="scene-object">
+                    <div class="cave-entrance"></div>
+                    <div class="piece-marker" id="marker-motor">⚙️</div>
+                </div>
+                <div id="swamp" class="scene-object">
+                    <div class="swamp-pool"></div>
+                    <div class="swamp-platform"></div>
+                    <div class="piece-marker" id="marker-tanque">⛽</div>
+                </div>
+                <div id="launch-pad" class="scene-object">
+                    <div id="rocket">
+                        <div id="rocket-motor-pod" class="rocket-part"></div>
+                        <div id="rocket-body" class="rocket-part"></div>
+                        <div id="rocket-nose-cone" class="rocket-part"></div>
+                        <div id="fuel-effect" class="rocket-effect"></div>
+                        <div id="launch-flame" class="rocket-effect"></div>
+                    </div>
+                    <div class="pad-base"></div>
+                </div>
+            </div>
+        </div>
+
+        <main id="ide-panel">
+            <div id="mission-control" class="ide-column">
+                <div class="ide-header">
+                    <h2>📜 Missão</h2>
+                </div>
+                <div id="mission-briefing">
+                    <h3 id="level-title">Carregando...</h3>
+                    <p id="level-description">...</p>
+                    <p id="level-hint" class="hidden"></p>
+                    <button id="hint-btn">Preciso de uma dica!</button>
+                    <button id="dev-next-level" class="hidden">Resolver Nível (Modo Dev)</button>
+                </div>
+            </div>
+            <div id="editor-panel" class="ide-column">
+                <div class="ide-header">
+                    <h2 id="editor-label">💻 Editor (Python)</h2>
+                </div>
+                <textarea id="code-editor" rows="10" aria-labelledby="editor-label"
+                    title="Editor de Comandos Python"></textarea>
+                <button id="run-btn">Enviar Comando 🚀</button>
+            </div>
+            <div id="console-panel" class="ide-column">
+                <div class="ide-header">
+                    <h2>>_ Console</h2>
+                </div>
+                <pre id="output-pre"></pre>
+            </div>
+        </main>
+    </div>
+
+
+    <div id="victory-screen" class="hidden">
+        <div class="victory-stars-bg"></div>
+        <div class="victory-content">
+            <h2>🏆 Missão Concluída! 🏆</h2>
+            <p>Parabéns, Comandante!</p>
+            <p>Sua perícia em programação Python guiou Bit de volta para casa, através das estrelas!</p>
+            <div class="credits">
+                <h3>Créditos</h3>
+                <p>Desenvolvido por:</p>
+                <p class="developer-name">Matheus Araújo</p>
+                <p>Obrigado por jogar!</p>
+            </div>
+            <button id="restart-btn">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop></audio>
+
+    <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
+    <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
+    <script src="game.js" type="text/javascript"></script>
+</body>
+
+</html>

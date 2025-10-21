@@ -1,0 +1,1126 @@
+/* --- :ROOT (Variáveis de Cor) --- */
+:root {
+    /* (Idêntico) */
+    --font-family: 'Nunito', sans-serif;
+    --primary-blue: #007aff;
+    --dark-text: #2c3e50;
+    --light-text: #576574;
+    --bg-light: #ffffff;
+    --bg-darker: #f4f7f6;
+    --border-color: #e0e0e0;
+    --success-green: #28a745;
+    --warning-orange: #f39c12;
+    --error-red: #e74c3c;
+    --console-bg: #2b2b2b;
+    --sky-color: #1a1f2b;
+    /* Azul/Preto um pouco mais profundo */
+    --ground-color: #6c757d;
+    --ground-dark: #495057;
+    --robot-blue: #54a0ff;
+    --robot-blue-dark: #2a7fff;
+    --robot-grey: #a4b0be;
+    --robot-metal: #d1d8e0;
+    --robot-visor-off: #343a40;
+    --robot-visor-on: #00e0ff;
+    --thruster-fire: #ffc400;
+    --thruster-fire-light: #ffe082;
+    --pos-start: 5%;
+    --pos-power: 20%;
+    --pos-cave: 35%;
+    --pos-swamp: 50%;
+    --pos-cliff: 65%;
+    --pos-rocket: 85%;
+}
+
+/* --- Layout Fixo --- */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-family);
+    background-color: var(--bg-darker);
+    color: var(--dark-text);
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 25px;
+    background-color: var(--primary-blue);
+    color: white;
+    flex-shrink: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.6em;
+}
+
+/* Controles de Música */
+#music-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 5px 10px;
+    border-radius: 50px;
+}
+
+.music-btn {
+    background: none;
+    border: none;
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 38px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.music-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#play-pause-btn {
+    font-size: 1.4em;
+}
+
+
+/* --- UI --- */
+#game-ui {
+    display: flex;
+    gap: 20px;
+}
+
+.ui-panel {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.ui-panel p {
+    margin: 0 0 5px 0;
+    font-size: 0.9em;
+    font-weight: 700;
+}
+
+#energy-bay {
+    min-width: 180px;
+}
+
+#energy-bar-container {
+    width: 100%;
+    height: 20px;
+    background: #ddd;
+    border-radius: 10px;
+    border: 2px solid #aaa;
+}
+
+#energy-bar {
+    width: 10%;
+    height: 100%;
+    background: linear-gradient(90deg, #fdd835, var(--success-green));
+    border-radius: 8px;
+    transition: width 0.5s ease-in-out;
+}
+
+#rocket-inventory {
+    min-width: 180px;
+}
+
+.rocket-parts {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.part-icon {
+    font-size: 1.5em;
+    opacity: 0.3;
+    transition: all 0.5s ease;
+    filter: grayscale(100%);
+}
+
+.part-icon.collected {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+/* --- Painel da Cena --- */
+#game-world {
+    flex-grow: 1;
+    min-height: 350px;
+    background-color: var(--sky-color);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--border-color);
+    transition: background-color 2s ease-in;
+}
+
+/* Fundo de Estrelas Aleatório */
+@keyframes move-stars-initial {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -1000px 1000px;
+    }
+}
+
+@keyframes move-stars-decolagem {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 10000px;
+    }
+}
+
+#stars-bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* CORREÇÃO: Múltiplas camadas de radial-gradient para aleatoriedade */
+    background-image:
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(1px 1px at 50px 160px, #ddd, rgba(255, 255, 255, 0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(2.5px 2.5px at 160px 120px, #ddd, rgba(255, 255, 255, 0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    /* Tamanho do padrão que se repete */
+    opacity: 0.8;
+    /* Um pouco mais visível */
+    animation: move-stars-initial 150s linear infinite;
+}
+
+#game-world.decolando #stars-bg {
+    animation: move-stars-decolagem 8s linear infinite;
+    opacity: 1;
+    background-size: 100px 100px;
+    /* Estrelas parecem mais próximas e rápidas */
+}
+
+#game-scene {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#game-scene::after {
+    /* Chão com textura de crateras */
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: var(--ground-color);
+    border-top: 4px solid var(--ground-dark);
+    background-image: radial-gradient(circle at 10% 20px, var(--ground-dark) 2px, transparent 3px),
+        radial-gradient(circle at 40% 30px, var(--ground-dark) 3px, transparent 4px),
+        radial-gradient(circle at 70% 15px, var(--ground-dark) 2.5px, transparent 3.5px),
+        radial-gradient(circle at 90% 25px, var(--ground-dark) 2px, transparent 3px);
+    background-size: 100% 100%;
+    transition: transform 2s ease-in, opacity 2s ease-in;
+}
+
+#game-world.decolando #game-scene::after {
+    transform: translateY(100px);
+    opacity: 0;
+}
+
+/* Regra para esconder objetos da cena */
+#game-world.decolando #power-station,
+#game-world.decolando #cliff,
+#game-world.decolando #cave,
+#game-world.decolando #swamp,
+#game-world.decolando .pad-base,
+#game-world.decolando .piece-marker {
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 1.5s ease-in, opacity 1s ease-in;
+}
+
+
+/* --- Painel IDE --- */
+#ide-panel {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    background: var(--bg-light);
+    min-height: 40%;
+}
+
+.ide-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    border-right: 1px solid var(--border-color);
+    box-shadow: 5px 0 5px -5px rgba(0, 0, 0, 0.1);
+}
+
+.ide-column:last-child {
+    border-right: none;
+    box-shadow: none;
+}
+
+.ide-header {
+    flex-shrink: 0;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-darker);
+}
+
+.ide-header h2 {
+    margin: 0;
+    font-size: 1.1em;
+    color: var(--light-text);
+    font-weight: 700;
+}
+
+#mission-control {
+    flex: 1;
+    min-width: 300px;
+    overflow-y: auto;
+}
+
+#mission-briefing {
+    padding: 15px;
+}
+
+#mission-briefing h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.4em;
+    color: var(--primary-blue);
+}
+
+#mission-briefing p {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+#level-hint {
+    background-color: #fffbe6;
+    border: 1px solid #ffe58f;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+#hint-btn,
+#dev-next-level {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: var(--font-family);
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+#hint-btn:hover {
+    background-color: var(--warning-orange);
+    color: white;
+    transform: translateY(-2px);
+}
+
+#dev-next-level {
+    background-color: var(--error-red);
+    color: white;
+    border: none;
+}
+
+#dev-next-level:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+#editor-panel {
+    flex: 1.5;
+    min-width: 350px;
+}
+
+#code-editor {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 10px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #fafafa;
+    resize: none;
+}
+
+#run-btn {
+    flex-shrink: 0;
+    padding: 15px;
+    background: linear-gradient(90deg, var(--success-green), #238b3a);
+    color: white;
+    border: none;
+    font-size: 1.2em;
+    font-weight: 700;
+    font-family: var(--font-family);
+    cursor: pointer;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+#run-btn:hover {
+    background: var(--success-green);
+    box-shadow: 0 -4px 10px rgba(40, 167, 69, 0.3);
+}
+
+#run-btn:disabled {
+    background: var(--robot-grey);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#console-panel {
+    flex: 1;
+    min-width: 300px;
+}
+
+#output-pre {
+    flex-grow: 1;
+    margin: 0;
+    padding: 10px;
+    background-color: var(--console-bg);
+    color: #f0f0f0;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-y: auto;
+}
+
+.output-success {
+    color: #76ff03 !important;
+}
+
+.output-error {
+    color: var(--error-red) !important;
+}
+
+/* --- Design do Robô (com Propulsor Melhorado) --- */
+#bit-robot-container {
+    position: absolute;
+    bottom: 50px;
+    left: var(--pos-start);
+    z-index: 10;
+    width: 80px;
+    height: 100px;
+    transition: left 1.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+#bit-robot-container.embarking {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.5s ease-in;
+}
+
+#bit-robot {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    animation: robot-bob 2s infinite ease-in-out;
+    transition: transform 0.5s ease;
+}
+
+@keyframes robot-bob {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.robot-antenna {
+    width: 4px;
+    height: 15px;
+    background: var(--robot-grey);
+    position: absolute;
+    top: -15px;
+    left: calc(50% - 2px);
+    border-radius: 2px;
+}
+
+.robot-antenna::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: var(--error-red);
+    border-radius: 50%;
+    position: absolute;
+    top: -5px;
+    left: -2px;
+}
+
+.robot-head {
+    width: 50px;
+    height: 45px;
+    background: var(--robot-blue);
+    border: 3px solid var(--robot-blue-dark);
+    border-radius: 25px 25px 10px 10px;
+    position: absolute;
+    top: 0;
+    left: calc(50% - 25px);
+    z-index: 2;
+}
+
+.robot-visor {
+    width: 38px;
+    height: 20px;
+    background: var(--robot-visor-off);
+    border: 2px solid var(--robot-blue-dark);
+    border-radius: 8px;
+    position: absolute;
+    top: 10px;
+    left: calc(50% - 19px);
+    transition: background-color 0.5s;
+}
+
+.robot-body {
+    width: 70px;
+    height: 45px;
+    background: var(--robot-metal);
+    border: 3px solid var(--robot-grey);
+    border-radius: 10px 10px 30px 30px;
+    position: absolute;
+    top: 35px;
+    left: calc(50% - 35px);
+    z-index: 1;
+}
+
+.robot-arm {
+    width: 10px;
+    height: 25px;
+    background: var(--robot-grey);
+    border: 2px solid var(--light-text);
+    border-radius: 5px;
+    position: absolute;
+    top: 8px;
+}
+
+.robot-arm.left {
+    left: -12px;
+}
+
+.robot-arm.right {
+    right: -12px;
+}
+
+.robot-thruster {
+    width: 20px;
+    height: 10px;
+    background: var(--robot-grey);
+    position: absolute;
+    bottom: 5px;
+    left: calc(50% - 10px);
+    border-radius: 0 0 5px 5px;
+}
+
+/* CORREÇÃO: Propulsor do Robô Aprimorado */
+.robot-thruster::after {
+    content: '';
+    width: 15px;
+    /* Mais largo que o propulsor */
+    height: 25px;
+    /* Mais alto */
+    background: linear-gradient(180deg, var(--thruster-fire-light), var(--thruster-fire), transparent);
+    /* Gradiente */
+    position: absolute;
+    bottom: -25px;
+    /* Abaixo do propulsor */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Centraliza */
+    border-radius: 0 0 50% 50%;
+    animation: robot-flicker 0.15s infinite alternate;
+    /* Animação flicker */
+    opacity: 0.9;
+}
+
+@keyframes robot-flicker {
+
+    /* Animação mais sutil que a do foguete */
+    0% {
+        opacity: 0.8;
+        transform: translateX(-50%) scale(0.9, 1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1, 1.1);
+    }
+}
+
+#bit-robot.sleeping {
+    transform: rotate(-10deg) translateX(-10px);
+    animation: none;
+}
+
+#bit-robot.sleeping .robot-visor {
+    background: var(--robot-visor-off);
+}
+
+#bit-robot.waking-up {
+    animation: robot-wake 1s ease-out forwards;
+}
+
+@keyframes robot-wake {
+    0% {
+        transform: rotate(-10deg) translateX(-10px);
+    }
+
+    70% {
+        transform: rotate(10deg) translateX(5px);
+    }
+
+    100% {
+        transform: rotate(0deg) translateX(0px);
+    }
+}
+
+#bit-robot:not(.sleeping) .robot-visor {
+    background: var(--robot-visor-on);
+    box-shadow: 0 0 10px var(--robot-visor-on);
+}
+
+#bit-robot.jumping {
+    animation: robot-jump 1s ease-in-out;
+}
+
+@keyframes robot-jump {
+    0% {
+        transform: translateY(0px) scale(1.0);
+    }
+
+    30% {
+        transform: translateY(10px) scale(1.1, 0.9);
+    }
+
+    60% {
+        transform: translateY(-70px) scale(0.9, 1.1);
+    }
+
+    100% {
+        transform: translateY(0px) scale(1.0);
+    }
+}
+
+/* --- Posições e Objetos da Cena --- */
+#bit-robot-container.at-power {
+    left: var(--pos-power);
+}
+
+#bit-robot-container.at-cave {
+    left: var(--pos-cave);
+}
+
+#bit-robot-container.at-swamp {
+    left: var(--pos-swamp);
+}
+
+#bit-robot-container.at-cliff {
+    left: var(--pos-cliff);
+}
+
+#bit-robot-container.at-rocket {
+    left: var(--pos-rocket);
+}
+
+.scene-object {
+    position: absolute;
+    bottom: 60px;
+    z-index: 5;
+}
+
+#power-station {
+    left: var(--pos-power);
+    width: 50px;
+    height: 60px;
+    background: var(--robot-grey);
+    border: 3px solid var(--light-text);
+    border-radius: 5px;
+}
+
+#cliff {
+    left: var(--pos-cliff);
+    width: 70px;
+    height: 100px;
+}
+
+.cliff-face {
+    width: 100%;
+    height: 100%;
+    background: #8d6e63;
+    border: 4px solid #5d4037;
+    border-radius: 10px 10px 0 0;
+}
+
+.cliff-top {
+    width: 100%;
+    height: 20px;
+    background: var(--ground-color);
+    border: 4px solid var(--ground-dark);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    position: absolute;
+    top: -10px;
+}
+
+#cave {
+    left: var(--pos-cave);
+    width: 80px;
+    height: 70px;
+    background: #795548;
+    border-radius: 40px 40px 0 0;
+}
+
+.cave-entrance {
+    width: 50px;
+    height: 50px;
+    background: #212121;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 25px);
+}
+
+#swamp {
+    left: var(--pos-swamp);
+    width: 90px;
+    height: 50px;
+}
+
+.swamp-pool {
+    width: 100%;
+    height: 30px;
+    background: #00695c;
+    border: 3px solid #004d40;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 0;
+}
+
+.swamp-platform {
+    width: 30px;
+    height: 30px;
+    background: #795548;
+    border: 3px solid #4e342e;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+.swamp-platform::after {
+    content: '';
+    width: 30px;
+    height: 30px;
+    background: #795548;
+    border: 3px solid #4e342e;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0px;
+    left: 40px;
+}
+
+/* Marcador de Peça */
+.piece-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    animation: glow 1.5s infinite alternate;
+    z-index: 6;
+    transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+    color: #ffd700;
+}
+
+#marker-bico {
+    /* CORREÇÃO: Sobe o marcador do bico */
+    top: -25px;
+    /* Ajuste para ficar em cima da parte verde */
+}
+
+@keyframes glow {
+    from {
+        opacity: 0.5;
+        text-shadow: 0 0 5px #ffeb3b;
+    }
+
+    to {
+        opacity: 1;
+        text-shadow: 0 0 15px #ffeb3b, 0 0 25px #ffeb3b;
+    }
+}
+
+.piece-marker.collected {
+    opacity: 0;
+    visibility: hidden;
+    animation: none;
+    /* CORREÇÃO: Para a animação ao coletar */
+}
+
+/* --- Foguete --- */
+#launch-pad {
+    left: var(--pos-rocket);
+    width: 80px;
+    height: 100px;
+}
+
+.pad-base {
+    width: 80px;
+    height: 15px;
+    background: var(--robot-metal);
+    border: 3px solid var(--robot-grey);
+    border-radius: 5px;
+    position: absolute;
+    bottom: 0;
+}
+
+#rocket {
+    width: 60px;
+    height: 170px;
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    transition: transform 1.5s ease-in;
+}
+
+.rocket-part {
+    position: absolute;
+    opacity: 0;
+    transition: all 0.5s ease-out;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+}
+
+#rocket-motor-pod {
+    width: 60px;
+    height: 35px;
+    background: #e74c3c;
+    border: 3px solid #c0392b;
+    border-radius: 8px 8px 25px 25px;
+    bottom: 0;
+}
+
+#rocket-body {
+    width: 50px;
+    height: 75px;
+    background: #3498db;
+    border: 3px solid #2980b9;
+    border-radius: 5px;
+    bottom: 32px;
+}
+
+#rocket-nose-cone {
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 60px solid #e74c3c;
+    position: absolute;
+    bottom: 105px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+}
+
+#rocket.has-motor #rocket-motor-pod {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+#rocket.has-tanque #rocket-body {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+#rocket.has-bico #rocket-nose-cone {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.rocket-effect {
+    position: absolute;
+    opacity: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#fuel-effect {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background: linear-gradient(180deg, transparent, #00e0ff50);
+    animation: fuel-glow 1s infinite alternate;
+}
+
+@keyframes fuel-glow {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 0.6;
+    }
+}
+
+/* Chama (CORRIGIDA) */
+#launch-flame {
+    width: 40px;
+    /* Mais estreito que o motor */
+    height: 80px;
+    background: linear-gradient(180deg, var(--thruster-fire), transparent);
+    bottom: -80px;
+    /* Posicionado abaixo do motor */
+    border-radius: 0 0 50% 50%;
+    left: 50%;
+    /* Centraliza */
+    transform: translateX(-50%);
+    /* Centraliza */
+    opacity: 0;
+    /* CORREÇÃO: Começa invisível */
+    animation: none;
+    /* CORREÇÃO: Animação desligada por padrão */
+}
+
+@keyframes flicker {
+
+    /* CORREÇÃO: Incluir translateX na animação para manter centralizado */
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1, 1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: translateX(-50%) scale(0.9, 1.1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1, 1);
+    }
+}
+
+#rocket.launched {
+    /* CORREÇÃO: Combina as transformações para manter centralizado */
+    transform: translateX(-50%) translateY(-450px);
+}
+
+#rocket.launched #launch-flame {
+    opacity: 1;
+    /* CORREÇÃO: Fica visível */
+    animation: flicker 0.2s infinite;
+    /* CORREÇÃO: Animação liga */
+}
+
+#speech-bubble {
+    position: absolute;
+    bottom: 130px;
+    left: var(--pos-start);
+    transform: translateX(40px);
+    z-index: 30;
+    background-color: #fff;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 2px solid #555;
+    width: max-content;
+    max-width: 200px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: left 1.5s ease-in-out;
+}
+
+#speech-bubble.at-power {
+    left: var(--pos-power);
+}
+
+#speech-bubble.at-cave {
+    left: var(--pos-cave);
+}
+
+#speech-bubble.at-swamp {
+    left: var(--pos-swamp);
+}
+
+#speech-bubble.at-cliff {
+    left: var(--pos-cliff);
+}
+
+#speech-bubble.at-rocket {
+    left: var(--pos-rocket);
+}
+
+/* --- Tela de Vitória --- */
+#victory-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease-in;
+}
+
+#victory-screen.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.victory-stars-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* CORREÇÃO: Estrelas aleatórias também na tela de vitória */
+    background-image:
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(1px 1px at 50px 160px, #ddd, rgba(255, 255, 255, 0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(255, 255, 255, 0)),
+        radial-gradient(2.5px 2.5px at 160px 120px, #ddd, rgba(255, 255, 255, 0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: victory-star-scroll 120s linear infinite;
+}
+
+@keyframes victory-star-scroll {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 1000px;
+    }
+}
+
+.victory-content {
+    position: relative;
+    z-index: 201;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 600px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+#victory-screen h2 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: #00e0ff;
+    text-shadow: 0 0 10px #00e0ff;
+}
+
+#victory-screen p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.credits {
+    margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 20px;
+}
+
+.credits h3 {
+    font-size: 1.8em;
+    color: #aaffaa;
+    margin-bottom: 10px;
+}
+
+.developer-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fdd835;
+    text-shadow: 0 0 8px #fdd835;
+    margin-bottom: 20px;
+}
+
+#restart-btn {
+    margin-top: 30px;
+    padding: 15px 30px;
+    font-size: 1.3em;
+    font-weight: bold;
+    background: linear-gradient(45deg, #007bff, #00c6ff);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+#restart-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.6);
+}
+
+/* Esconder o elemento de áudio padrão */
+#bg-music {
+    display: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Garante que .hidden sempre funcione */
